@@ -1,10 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useReactMediaRecorder } from 'react-media-recorder';
+import ReactMarkdown from 'react-markdown';
 import api from '../services/api';
 import Modal from '../components/Modal';
 
 const Interview = () => {
+    // ... existing state ... 
     const { id } = useParams();
     const navigate = useNavigate();
     const [session, setSession] = useState(null);
@@ -175,7 +177,7 @@ const Interview = () => {
                         Join Interview
                     </button>
                     <div style={{ marginTop: '1rem' }}>
-                        <button onClick={() => navigate('/')} className="btn btn-secondary">Cancel</button>
+                        <button onClick={() => navigate(-1)} className="btn btn-secondary">Cancel</button>
                     </div>
                 </div>
             </div>
@@ -261,16 +263,26 @@ const Interview = () => {
                 </div>
 
                 {/* Status Text */}
-                <div style={{ marginTop: '3rem', textAlign: 'center', minHeight: '80px' }}>
+                <div style={{ marginTop: '3rem', textAlign: 'center', minHeight: '80px', width: '100%', padding: '0 2rem' }}>
                     <h3 style={{ fontSize: '1.5rem', fontWeight: '400', color: 'var(--text-secondary)' }}>
                         {aiSpeaking ? "AI is speaking..." :
                             isProcessing ? "Thinking..." :
                                 status === 'recording' ? "Listening..." : "Tap mic to speak"}
                     </h3>
                     {latestAiMessage && !aiSpeaking && !isProcessing && status !== 'recording' && (
-                        <p style={{ maxWidth: '600px', margin: '0 auto', opacity: 0.7, padding: '0 1rem', lineHeight: '1.5' }}>
-                            "{latestAiMessage.content}"
-                        </p>
+                        <div style={{
+                            maxWidth: '700px',
+                            margin: '0 auto',
+                            opacity: 0.9,
+                            padding: '1.5rem',
+                            lineHeight: '1.6',
+                            background: 'rgba(0,0,0,0.3)',
+                            borderRadius: '1rem',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid var(--glass-border)'
+                        }}>
+                            <ReactMarkdown>{latestAiMessage.content}</ReactMarkdown>
+                        </div>
                     )}
                 </div>
 

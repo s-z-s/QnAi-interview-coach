@@ -85,7 +85,7 @@ const HistoryPage = () => {
 
                                 <div style={{ display: 'flex', gap: '1rem' }}>
                                     <button
-                                        onClick={() => navigate(`/analysis/${sess._id}`)}
+                                        onClick={() => navigate(`/analysis/${sess._id}`, { state: { from: '/history' } })}
                                         className="btn btn-secondary"
                                     >
                                         View Report

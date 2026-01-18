@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Modal = ({ isOpen, title, message, onConfirm, onCancel, confirmText = "Confirm", cancelText = "Cancel", type = "danger" }) => {
+const Modal = ({ isOpen, title, message, onConfirm, onCancel, confirmText = "Confirm", cancelText = "Cancel", type = "danger", children }) => {
     if (!isOpen) return null;
 
     return (
@@ -28,6 +28,7 @@ const Modal = ({ isOpen, title, message, onConfirm, onCancel, confirmText = "Con
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', lineHeight: '1.5' }}>
                     {message}
                 </p>
+                {children}
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                     {onCancel && (
                         <button

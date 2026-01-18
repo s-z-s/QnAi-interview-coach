@@ -11,7 +11,8 @@ const {
     deleteJob,
     generateQuestions,
     updateQuestionNotes,
-    analyzePracticeAnswer
+    analyzePracticeAnswer,
+    addQuestion
 } = require('../controllers/jobController');
 
 router.route('/')
@@ -23,6 +24,7 @@ router.route('/:id')
     .delete(protect, deleteJob);
 
 router.post('/:id/generate-questions', protect, generateQuestions);
+router.post('/:id/add-question', protect, addQuestion);
 router.put('/:id/questions', protect, updateQuestionNotes);
 router.post('/practice', protect, upload.single('audio'), analyzePracticeAnswer);
 

@@ -11,7 +11,7 @@ const LandingPage = () => {
                 <div className="text-gradient" style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>QnAi</div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     {user ? (
-                        <Link to="/" className="btn btn-primary">Go to Dashboard</Link>
+                        <Link to="/dashboard" className="btn btn-primary">Go to Dashboard</Link>
                     ) : (
                         <>
                             <Link to="/login" className="btn btn-secondary">Login</Link>
@@ -53,8 +53,12 @@ const LandingPage = () => {
                 </p>
 
                 <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                    <Link to="/register" className="btn btn-primary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
-                        Start Practicing Now
+                    <Link
+                        to={user ? "/dashboard" : "/register"}
+                        className="btn btn-primary"
+                        style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}
+                    >
+                        {user ? "Go to Dashboard" : "Start Practicing Now"}
                     </Link>
                     <a href="#features" className="btn btn-secondary" style={{ padding: '1rem 2rem', fontSize: '1.1rem' }}>
                         Learn More
@@ -153,8 +157,12 @@ const LandingPage = () => {
                     <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '1.2rem' }}>
                         Join thousands of candidates who are leveling up their communication skills with QnAi.
                     </p>
-                    <Link to="/register" className="btn btn-primary" style={{ padding: '1rem 2.5rem', fontSize: '1.2rem' }}>
-                        Get Started for Free
+                    <Link
+                        to={user ? "/dashboard" : "/register"}
+                        className="btn btn-primary"
+                        style={{ padding: '1rem 2.5rem', fontSize: '1.2rem' }}
+                    >
+                        {user ? "Go to Dashboard" : "Get Started for Free"}
                     </Link>
                 </div>
             </section>

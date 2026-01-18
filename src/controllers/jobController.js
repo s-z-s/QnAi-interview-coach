@@ -139,56 +139,99 @@ const updateQuestionNotes = async (req, res) => {
 // @route POST /api/jobs/practice
 const analyzePracticeAnswer = async (req, res) => {
     try {
-        const { question, notes, audio } = req.body;
-        // Audio handling middleware puts file in req.file, need to handle here just like interviewController
-        // Actually, let's assume express-fileupload or multer usage.
-        // Wait, route receives formData.
+        const { question, notes, audio, jobId, questionId } = req.body;
 
-        // REUSE TRANSCRIPTION LOGIC? 
-        // I need to import transcribeAudio from interviewController or move it to a service.
-        // It's not exported. I should probably move AI logic to utils.
-        // For speed, I'll duplicate the simple transcription call or export it.
-        // Let's modify interviewController to export its helpers or just Quick Fix:
-
-        // Actually, let's create a dedicated service: `src/services/aiService.js`?
-        // Or just require the controller and access? No.
-
-        // I will implement it here using clean imports.
+        // Transcription (Reuse ElevenLabs Client)
         const { ElevenLabsClient } = require('elevenlabs');
-        const { GoogleGenerativeAI } = require('@google/generative-ai');
         const { Blob } = require('buffer');
 
-        // Transcription
+        // Use uploaded file if present, otherwise handle error
+        if (!req.file) {
+            return res.status(400).json({ message: 'No audio file uploaded' });
+        }
+
         const elevenLabsClient = new ElevenLabsClient({ apiKey: process.env.ELEVENLABS_API_KEY });
         const audioBlob = new Blob([req.file.buffer], { type: req.file.mimetype });
+
         const scribe = await elevenLabsClient.speechToText.convert({
             file: audioBlob,
             model_id: "scribe_v2",
-            tag_audio_events: true,
+            tag_audio_events: false, // Changed to false for cleaner text
             language_code: "eng"
         });
         const userAnswer = scribe.text;
 
-        // Analysis
+        // Analysis with Gemini
         const prompt = `
         Evaluate this answer to an interview question.
+        
         Question: "${question}"
         User's Notes (Context/Plan): "${notes || 'None'}"
         User's Answer: "${userAnswer}"
 
+        **IMPORTANT**: Write the feedback in **SECOND PERSON** (address the candidate as **"You"**).
+
         Provide short, specific feedback and a score (0-100).
-        Output JSON: { "score": 85, "feedback": "...", "improvedAnswer": "..." }
+        Output STRICT JSON: { "score": 85, "feedback": "Markdown supported feedback. Address user as 'You'...", "improvedAnswer": "Markdown supported improved answer..." }
         `;
 
         const text = await robustGeminiRequest(prompt, { jsonMode: true });
         const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
         const analysis = JSON.parse(cleanText);
 
+        // Save to Database
+        if (jobId && questionId) {
+            const job = await JobApplication.findById(jobId);
+            if (job) {
+                const q = job.questions.id(questionId);
+                if (q) {
+                    q.userAnswer = userAnswer;
+                    q.score = analysis.score;
+                    q.aiFeedback = analysis.feedback;
+                    q.improvedAnswer = analysis.improvedAnswer;
+                    q.practicedAt = new Date();
+                    await job.save();
+                }
+            }
+        }
+
         res.json({ userAnswer, analysis });
 
     } catch (error) {
         console.error("Practice Error:", error);
         res.status(500).json({ message: 'Analysis failed' });
+    }
+    // Removed duplicate }
+    // Ensure catch closes the function correctly 
+    // (This replacement replaces the entire try/catch block logic)
+};
+
+// @desc Add a manual question
+// @route POST /api/jobs/:id/add-question
+const addQuestion = async (req, res) => {
+    try {
+        const { question } = req.body;
+        if (!question) {
+            return res.status(400).json({ message: 'Question text is required' });
+        }
+
+        const job = await JobApplication.findById(req.params.id);
+        if (!job) return res.status(404).json({ message: 'Job not found' });
+
+        if (job.userId.toString() !== req.user.id) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        job.questions.push({
+            question: question,
+            questionType: 'Custom'
+        });
+
+        await job.save();
+        res.json(job);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server Error' });
     }
 };
 
@@ -199,5 +242,6 @@ module.exports = {
     deleteJob,
     generateQuestions,
     updateQuestionNotes,
-    analyzePracticeAnswer
+    analyzePracticeAnswer,
+    addQuestion
 };

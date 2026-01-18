@@ -25,8 +25,14 @@ const jobApplicationSchema = mongoose.Schema({
     },
     questions: [{
         question: String,
-        notes: String, // User's notes on how to answer
-        aiExpectedAnswer: String // Optional AI hint
+        notes: String, // User's notes
+        aiExpectedAnswer: String, // Optional AI hint
+        // Practice Session Data
+        userAnswer: String,
+        aiFeedback: String,
+        score: Number,
+        improvedAnswer: String,
+        practicedAt: Date
     }]
 }, {
     timestamps: true

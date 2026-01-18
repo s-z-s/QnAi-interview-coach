@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
 
 const Analysis = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const location = useLocation();
     const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -27,9 +28,21 @@ const Analysis = () => {
 
     const { analysis } = session;
 
+    const handleBack = () => {
+        if (location.state?.from) {
+            navigate(location.state.from);
+        } else if (session && session.jobApplicationId) {
+            navigate(`/job/${session.jobApplicationId}`);
+        } else {
+            navigate('/dashboard');
+        }
+    };
+
     return (
         <div className="container" style={{ padding: '2rem 1rem' }}>
-            <button onClick={() => navigate('/')} className="btn btn-secondary" style={{ marginBottom: '2rem' }}>← Back to Dashboard</button>
+            <button onClick={handleBack} className="btn btn-secondary" style={{ marginBottom: '2rem' }}>
+                {location.state?.from === '/history' ? '← Back to History' : '← Back to Job'}
+            </button>
 
             <div className="glass-panel" style={{ padding: '3rem', maxWidth: '800px', margin: '0 auto' }}>
                 <h1 className="text-gradient" style={{ textAlign: 'center', marginBottom: '2rem' }}>Interview Analysis</h1>

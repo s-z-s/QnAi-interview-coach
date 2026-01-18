@@ -2,7 +2,8 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const MODELS = [
     'gemini-2.5-flash',
-    'gemini-2.5-flash-preview-09-2025', // User specific request
+    'gemini-3-flash-preview',
+    'gemini-2.5-flash-preview-09-2025',
     'gemini-2.0-flash',
     'gemini-2.5-flash-lite',
     'gemini-2.0-flash-lite'

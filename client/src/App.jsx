@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
+import usePageTitle from './hooks/usePageTitle';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 
@@ -20,34 +21,43 @@ const PrivateRoute = () => {
   return user ? <Outlet /> : <Navigate to="/login" />;
 };
 
+// Wrapper component to use the hook inside Router context
+const AppContent = () => {
+  usePageTitle(); // Activates dynamic titles
+
+  return (
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+
+      {/* Protected Routes */}
+      <Route element={<PrivateRoute />}>
+
+        {/* Routes wrapped in Main Layout (Nav Bar) */}
+        <Route element={<Layout />}>
+          <Route path="/dashboard" element={<JobDashboard />} />
+          <Route path="/job/:id" element={<JobDetailsPage />} />
+          <Route path="/practice/:jobId/:questionId" element={<PracticeQuestionPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/analysis/:id" element={<Analysis />} />
+        </Route>
+
+        {/* Routes without Layout (Full Screen) */}
+        <Route path="/interview/:id" element={<Interview />} />
+        <Route path="/interview/new" element={<Navigate to="/dashboard" replace />} />
+
+      </Route>
+    </Routes>
+  );
+};
+
 function App() {
   return (
     <Router>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-
-        {/* Protected Routes */}
-        <Route element={<PrivateRoute />}>
-
-          {/* Routes wrapped in Main Layout (Nav Bar) */}
-          <Route element={<Layout />}>
-            <Route path="/dashboard" element={<JobDashboard />} />
-            <Route path="/job/:id" element={<JobDetailsPage />} />
-            <Route path="/practice/:jobId/:questionId" element={<PracticeQuestionPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/history" element={<HistoryPage />} />
-            <Route path="/analysis/:id" element={<Analysis />} />
-          </Route>
-
-          {/* Routes without Layout (Full Screen) */}
-          <Route path="/interview/:id" element={<Interview />} />
-          <Route path="/interview/new" element={<Navigate to="/dashboard" replace />} />
-
-        </Route>
-      </Routes>
+      <AppContent />
     </Router>
   );
 }

@@ -67,21 +67,60 @@ async function generateAudio(text) {
 }
 
 // **GEMINI FUNCTION**
-async function getAIResponse(history, latestUserMessage, cvText, jobDescription) {
+// **GEMINI FUNCTION**
+async function getAIResponse(history, latestUserMessage, cvText, jobDescription, purpose = 'Job Interview') {
     try {
-        const systemInstruction = "You are an empathetic interview coach. Keep questions short. Analyze the user's answer for content and tone before asking the next question.";
+        const systemInstruction = `You are an empathetic interview coach conducting a ${purpose}. Keep questions short. Analyze the user's answer for content and tone before asking the next question.`;
         const context = `
       Context:
       CV: ${cvText}
       Job Description: ${jobDescription}
     `;
 
-        // Format history for helper? 
-        // Helper expects [{role: 'ai'|'user', content: '...'}]
-        // internal history is [{role: 'ai', content: '...'}]. 
-        // So we can pass it directly and let helper map it.
-        const responseText = await robustGeminiRequest(`${context}\nUser Answer: ${latestUserMessage}`, {
-            history: history,
+        // Gemini requires history to start with 'user'.
+        // Filter out any initial AI messages if they don't have a preceding user message.
+        // Or, simpler: Just ensure the history array passed to Gemini works.
+        // If history[0].role === 'ai', we must prepend a dummy user message or the context as a user message.
+
+        // Let's Clean the history:
+        // 1. Map 'ai' -> 'model' (handled in helper, but let's be sure of structure)
+        // 2. Ensure alternating User-Model
+
+        // Actually, the easiest fix is to include the Context as the VERY FIRST User message in the history.
+        // Then the rest of the history (AI greeting, etc) follows naturally.
+
+        let validHistory = [];
+
+        // Prepend context as first user message
+        validHistory.push({
+            role: 'user',
+            content: `Start the interview. ${context}`
+        });
+
+        // Add the existing history
+        // verify history structure is {role: 'ai'|'user', content: string}
+        if (history && history.length > 0) {
+            history.forEach(msg => {
+                validHistory.push({
+                    role: msg.role,
+                    content: msg.content
+                });
+            });
+        }
+
+        // Now validHistory starts with User.
+        // If the *actual* DB history started with AI (greeting), it will be the second message (Model), which is valid (User -> Model).
+
+        // However, robustGeminiRequest appends latestUserMessage to the prompt.
+        // So we just need to pass the validHistory as the history.
+
+        // Wait, if I add context to history, I shouldn't add it to the prompt again?
+        // robustGeminiRequest uses `chat.sendMessage(prompt)`.
+
+        // Let's Pass the clean history.
+
+        const responseText = await robustGeminiRequest(latestUserMessage, {
+            history: validHistory, // Now guaranteed to start with User
             systemInstruction: systemInstruction
         });
 
@@ -122,8 +161,24 @@ const startSession = async (req, res) => {
             }
         }
 
-        // 2. Generate Initial Greeting
-        const initialGreeting = "Hello! I've reviewed your CV and the job details. I'm ready to start. Please tell me a little about yourself.";
+        // 2. Generate Initial Greeting (Context-Aware)
+        const purpose = req.user.purpose || 'Job Interview';
+        let initialGreeting = "";
+
+        switch (purpose) {
+            case 'College Interview':
+                initialGreeting = "Hello! I've reviewed your application details and your CV. I'm ready to help you prepare for your college interview. Could you start by introducing yourself?";
+                break;
+            case 'Scholarship Interview':
+                initialGreeting = "Hello! I've looked over your CV. Let's practice for your scholarship interview. To begin, please tell me a bit about yourself and your academic goals.";
+                break;
+            case 'General Practice':
+                initialGreeting = "Hello! I'm here to help you improve your communication skills. Let's have a casual practice session. Tell me, what's on your mind today?";
+                break;
+            default: // Job Interview
+                initialGreeting = "Hello! I've reviewed your CV and the job details. I'm ready to start the interview. Please tell me a little about yourself.";
+                break;
+        }
         let audioBase64 = null;
         try {
             audioBase64 = await generateAudio(initialGreeting);
@@ -210,7 +265,7 @@ const handleAnswer = async (req, res) => {
         const history = session.messages.slice(0, -1); // All except the new one
 
         // Use the simplified getAIResponse function which now uses the robust helper
-        const aiText = await getAIResponse(history, userText, session.cvText, session.jobDescription);
+        const aiText = await getAIResponse(history, userText, session.cvText, session.jobDescription, req.user.purpose);
 
         // 4. Generate AI Audio (TTS)
         console.log("Generating AI Audio...");
@@ -273,13 +328,16 @@ const endSession = async (req, res) => {
         Interview Transcript:
         ${historyText}
         
+        **IMPORTANT**: Write the feedback in **SECOND PERSON** (address the candidate as **"You"**, do NOT use "The candidate/"he"/"she").
+        Example: "You did a great job explaining..." instead of "The candidate did a great job..."
+
         Provide the output in STRICT JSON format:
         {
             "score": number (0-100),
             "hiringProbability": "High" | "Medium" | "Low",
-            "feedback": "Overall concise feedback summary",
-            "strengths": ["point 1", "point 2"],
-            "improvements": ["point 1", "point 2"],
+            "feedback": "Overall concise feedback in markdown (bullet points). Address the user directly as 'You'.",
+            "strengths": ["Strength 1", "Strength 2"],
+            "improvements": ["Improvement 1", "Improvement 2"],
             "questions": [
                 {
                     "question": "The question asked by AI",
@@ -321,8 +379,19 @@ const endSession = async (req, res) => {
 // @route GET /api/interview/history
 const getHistory = async (req, res) => {
     try {
+        const matchStage = { userId: req.user._id };
+        if (req.query.jobId) {
+            // Ensure jobId is converted to ObjectId if you use Mongoose Types, but usually string works in find.
+            // In aggregation $match, if field is ObjectId, we often need to match ObjectId.
+            // Mongoose might cast automatically if we use find, but in aggregate we might need to be careful.
+            // Let's assume Mongoose 7/8+ or simple string match if schema is ObjectId.
+            // SAFEST: Let mongoose handle casting by using new mongoose.Types.ObjectId(req.query.jobId)
+            const mongoose = require('mongoose');
+            matchStage.jobApplicationId = new mongoose.Types.ObjectId(req.query.jobId);
+        }
+
         const sessions = await Session.aggregate([
-            { $match: { userId: req.user._id } },
+            { $match: matchStage },
             {
                 $project: {
                     createdAt: 1,
