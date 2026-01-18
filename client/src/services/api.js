@@ -5,6 +5,7 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true, // Required to send cookies
 });
 
 // Add a request interceptor to handle errors or headers if needed

@@ -42,8 +42,8 @@ const registerUser = async (req, res) => {
         // Set HTTP-only cookie
         res.cookie('jwt', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-            sameSite: 'strict', // Prevent CSRF
+            secure: true, // Required for SameSite: None
+            sameSite: 'none', // Required for Cross-Site (Vercel -> DuckDNS)
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         });
 
@@ -71,8 +71,8 @@ const loginUser = async (req, res) => {
         // Set HTTP-only cookie
         res.cookie('jwt', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
+            secure: true,
+            sameSite: 'none',
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
         });
 
@@ -134,20 +134,12 @@ const updateProfile = async (req, res) => {
         if (req.file) {
             try {
                 const pdfLibrary = require('pdf-parse');
-                console.log("DEBUG: pdfLibrary type:", typeof pdfLibrary);
-                console.log("DEBUG: pdfLibrary keys:", Object.keys(pdfLibrary));
-                try {
-                    console.log("DEBUG: pdfLibrary prototype:", Object.getPrototypeOf(pdfLibrary));
-                } catch (e) { }
 
                 // Try to find the function fallback
                 let pdfParse = pdfLibrary;
                 if (typeof pdfParse !== 'function') {
                     if (pdfLibrary.default && typeof pdfLibrary.default === 'function') {
                         pdfParse = pdfLibrary.default;
-                    } else {
-                        // If we can't find it, we throw, but the LOGS above are what I need the user to see in terminal
-                        throw new Error(`pdf-parse broken. Keys: ${JSON.stringify(Object.keys(pdfLibrary))}`);
                     }
                 }
 
