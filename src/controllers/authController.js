@@ -50,6 +50,7 @@ const registerUser = async (req, res) => {
         res.status(201).json({
             _id: user.id,
             email: user.email,
+            token: token, // Return token for Bearer auth
         });
     } else {
         res.status(400).json({ message: 'Invalid user data' });
@@ -79,6 +80,7 @@ const loginUser = async (req, res) => {
         res.json({
             _id: user.id,
             email: user.email,
+            token: token, // Return token for Bearer auth
         });
     } else {
         res.status(400).json({ message: 'Invalid credentials' });

@@ -9,6 +9,20 @@ const api = axios.create({
 });
 
 // Add a request interceptor to handle errors or headers if needed
+api.interceptors.request.use(
+    (config) => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const user = JSON.parse(storedUser);
+            if (user.token) {
+                config.headers.Authorization = `Bearer ${user.token}`;
+            }
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
+);
+
 api.interceptors.response.use(
     (response) => response,
     (error) => {
