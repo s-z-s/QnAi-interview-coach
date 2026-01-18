@@ -109,6 +109,26 @@ nginx -t
 systemctl restart nginx
 ```
 
+### 1.8 Setup SSL with Certbot (HTTPS)
+Install Certbot and the Nginx plugin:
+```bash
+apt install certbot python3-certbot-nginx -y
+```
+
+Obtain and install the certificate:
+```bash
+certbot --nginx -d your-api-domain.com
+```
+- Enter your email when prompted.
+- Agree to terms.
+- **Select '2'** to redirect HTTP to HTTPS (Recommended).
+
+Verify Auto-Renewal:
+Certbot sets up a timer automatically. Test it:
+```bash
+certbot renew --dry-run
+```
+
 ---
 
 ## Part 2: Frontend Deployment (Vercel)
