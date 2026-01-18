@@ -78,10 +78,13 @@ const generateQuestions = async (req, res) => {
 
         const prompt = `
         Generate 10 highly probable interview questions for this specific role, taking into account the candidate's CV and Job Description.
+        
+        Candidate Context:
+        - Goal: ${user.purpose}
+        - CV: ${user.cvText}
 
-        Candidate CV: ${user.cvText}
-        Job Description: ${job.description}
-        Job Title: ${job.jobTitle} at ${job.company}
+        Job/Context Description: ${job.description}
+        Role Title: ${job.jobTitle} at ${job.company}
 
         Output STRICT JSON array:
         [

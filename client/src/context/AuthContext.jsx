@@ -24,8 +24,8 @@ export const AuthProvider = ({ children }) => {
         return res.data;
     };
 
-    const register = async (email, password) => {
-        const res = await api.post('/auth/register', { email, password });
+    const register = async (email, password, name, purpose) => {
+        const res = await api.post('/auth/register', { email, password, name, purpose });
         setUser(res.data);
         localStorage.setItem('user', JSON.stringify(res.data));
         return res.data;
@@ -37,8 +37,13 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
     };
 
+    const updateUser = (userData) => {
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+    };
+
     return (
-        <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, register, logout, updateUser, loading }}>
             {!loading && children}
         </AuthContext.Provider>
     );

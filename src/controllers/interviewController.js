@@ -266,6 +266,7 @@ const endSession = async (req, res) => {
         const prompt = `
         Analyze this interview session based on the candidate's CV and Job Description.
         
+        Candidate Goal: ${req.user.purpose || 'Job Interview'}
         CV: ${cvTextSafe}
         Job Description: ${jdTextSafe}
         

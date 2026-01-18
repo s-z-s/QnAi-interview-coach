@@ -6,6 +6,15 @@ const userSchema = mongoose.Schema({
         required: true,
         unique: true
     },
+    name: {
+        type: String,
+        required: true
+    },
+    purpose: {
+        type: String,
+        enum: ['Job Interview', 'College Interview', 'Scholarship Interview', 'General Practice'],
+        default: 'Job Interview'
+    },
     password_hash: {
         type: String,
         required: true

@@ -12,6 +12,7 @@ import ProfilePage from './pages/ProfilePage';
 import HistoryPage from './pages/HistoryPage';
 import Analysis from './pages/Analysis';
 import Layout from './components/Layout';
+import LandingPage from './pages/LandingPage';
 
 const PrivateRoute = () => {
   const { user, loading } = useAuth();
@@ -24,6 +25,7 @@ function App() {
     <Router>
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
@@ -32,7 +34,7 @@ function App() {
 
           {/* Routes wrapped in Main Layout (Nav Bar) */}
           <Route element={<Layout />}>
-            <Route path="/" element={<JobDashboard />} />
+            <Route path="/dashboard" element={<JobDashboard />} />
             <Route path="/job/:id" element={<JobDetailsPage />} />
             <Route path="/practice/:jobId/:questionId" element={<PracticeQuestionPage />} />
             <Route path="/profile" element={<ProfilePage />} />
@@ -42,9 +44,7 @@ function App() {
 
           {/* Routes without Layout (Full Screen) */}
           <Route path="/interview/:id" element={<Interview />} />
-
-          {/* Redirect 'new' to dashboard since it handles start */}
-          <Route path="/interview/new" element={<Navigate to="/" replace />} />
+          <Route path="/interview/new" element={<Navigate to="/dashboard" replace />} />
 
         </Route>
       </Routes>

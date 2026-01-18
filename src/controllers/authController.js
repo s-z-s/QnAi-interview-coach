@@ -13,9 +13,9 @@ const generateToken = (id) => {
 // @route   POST /api/auth/register
 // @access  Public
 const registerUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, name, purpose } = req.body;
 
-    if (!email || !password) {
+    if (!email || !password || !name) {
         return res.status(400).json({ message: 'Please add all fields' });
     }
 
@@ -32,7 +32,9 @@ const registerUser = async (req, res) => {
 
     // Create user
     const user = await User.create({
+        name,
         email,
+        purpose: purpose || 'Job Interview',
         password_hash: hashedPassword,
     });
 
@@ -113,7 +115,9 @@ const getProfile = async (req, res) => {
     if (user) {
         res.json({
             _id: user.id,
+            name: user.name,
             email: user.email,
+            purpose: user.purpose,
             cvText: user.cvText,
             jobDescription: user.jobDescription
         });
@@ -129,6 +133,8 @@ const updateProfile = async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (user) {
+        user.name = req.body.name || user.name;
+        user.purpose = req.body.purpose || user.purpose;
         user.jobDescription = req.body.jobDescription || user.jobDescription;
         user.cvText = req.body.cvText || user.cvText;
 
@@ -160,7 +166,9 @@ const updateProfile = async (req, res) => {
 
         res.json({
             _id: updatedUser.id,
+            name: updatedUser.name,
             email: updatedUser.email,
+            purpose: updatedUser.purpose,
             cvText: updatedUser.cvText,
             jobDescription: updatedUser.jobDescription
         });

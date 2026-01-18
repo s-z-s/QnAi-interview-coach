@@ -95,16 +95,19 @@ const HistoryPage = () => {
                                         className="btn"
                                         style={{
                                             color: 'var(--error-color)',
-                                            fontSize: '1.2rem',
-                                            padding: '0.5rem',
-                                            borderRadius: '50%',
+                                            borderColor: 'var(--error-color)',
+                                            fontSize: '1rem',
+                                            padding: '0.4rem 0.8rem',
+                                            borderRadius: '0.5rem',
+                                            border: '1px solid',
+                                            background: 'transparent',
                                             transition: 'background 0.2s'
                                         }}
                                         title="Delete"
                                         onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
                                         onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                                     >
-                                        🗑️
+                                        Delete
                                     </button>
                                 </div>
                             </div>

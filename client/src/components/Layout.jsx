@@ -42,9 +42,9 @@ const Layout = () => {
 
                     {/* Nav Links */}
                     <div style={{ display: 'flex', gap: '1rem' }}>
-                        <Link to="/" style={{
-                            color: isActive('/') ? 'var(--accent-color)' : 'var(--text-secondary)',
-                            fontWeight: isActive('/') ? 'bold' : 'normal',
+                        <Link to="/dashboard" style={{
+                            color: isActive('/dashboard') ? 'var(--accent-color)' : 'var(--text-secondary)',
+                            fontWeight: isActive('/dashboard') ? 'bold' : 'normal',
                             transition: 'color 0.2s',
                             padding: '0.5rem',
                         }}>
@@ -82,15 +82,17 @@ const Layout = () => {
                         onClick={() => setShowLogoutModal(true)}
                         className="btn"
                         style={{
-                            color: 'var(--text-secondary)',
+                            color: 'var(--error-color)',
+                            borderColor: 'var(--error-color)',
                             fontSize: '0.9rem',
-                            border: '1px solid rgba(255,255,255,0.1)',
+                            border: '1px solid',
                             padding: '0.6rem 1.2rem',
                             borderRadius: '0.5rem',
+                            background: 'transparent',
                             transition: 'all 0.2s'
                         }}
-                        onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--error-color)'; e.currentTarget.style.color = 'var(--error-color)'; }}
-                        onMouseOut={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                        onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'; }}
+                        onMouseOut={(e) => { e.currentTarget.style.background = 'transparent'; }}
                     >
                         Sign Out
                     </button>
