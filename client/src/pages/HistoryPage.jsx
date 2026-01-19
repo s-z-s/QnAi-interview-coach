@@ -27,9 +27,9 @@ const HistoryPage = () => {
     const confirmDelete = (id) => {
         setModalConfig({
             isOpen: true,
-            title: "Delete Interview",
-            message: "Are you sure you want to delete this session? This action cannot be undone.",
-            confirmText: "Delete",
+            title: "Remove Interview",
+            message: "Are you sure you want to remove this session? This action cannot be undone.",
+            confirmText: "Remove",
             type: "danger",
             onConfirm: () => handleDelete(id),
             onCancel: () => setModalConfig(prev => ({ ...prev, isOpen: false }))
@@ -63,10 +63,14 @@ const HistoryPage = () => {
                         <div key={sess._id} className="glass-panel" style={{ padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                                 <div style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
-                                    {new Date(sess.createdAt).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                    {sess.jobTitle ? (
+                                        <span>{sess.jobTitle} <span style={{ opacity: 0.6, fontSize: '0.9rem', fontWeight: 'normal' }}>at {sess.company}</span></span>
+                                    ) : (
+                                        <span>General Practice</span>
+                                    )}
                                 </div>
-                                <div style={{ color: 'var(--text-secondary)', marginTop: '0.5rem' }}>
-                                    {new Date(sess.createdAt).toLocaleTimeString()}
+                                <div style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                                    {new Date(sess.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })} · {new Date(sess.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </div>
                             </div>
 
@@ -103,11 +107,11 @@ const HistoryPage = () => {
                                             background: 'transparent',
                                             transition: 'background 0.2s'
                                         }}
-                                        title="Delete"
+                                        title="Remove"
                                         onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
                                         onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
                                     >
-                                        Delete
+                                        Remove
                                     </button>
                                 </div>
                             </div>

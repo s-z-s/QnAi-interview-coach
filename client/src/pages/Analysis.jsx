@@ -67,6 +67,29 @@ const Analysis = () => {
                     </div>
                 </div>
 
+                {/* Category Breakdown */}
+                {analysis.categories && analysis.categories.length > 0 && (
+                    <div style={{ marginBottom: '3rem' }}>
+                        <h3 style={{ textAlign: 'center', marginBottom: '1.5rem', color: 'var(--text-secondary)' }}>Performance by Category</h3>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
+                            {analysis.categories.map((cat, idx) => (
+                                <div key={idx} className="glass-panel" style={{ padding: '1.5rem', textAlign: 'center', background: 'rgba(255,255,255,0.03)' }}>
+                                    <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '1rem', color: 'var(--text-primary)' }}>{cat.category}</h4>
+                                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: cat.score >= 70 ? 'var(--success-color)' : 'var(--accent-color)', marginBottom: '0.5rem' }}>
+                                        {cat.score}%
+                                    </div>
+                                    <div style={{ width: '100%', height: '6px', background: 'var(--glass-border)', borderRadius: '3px', marginBottom: '0.8rem', overflow: 'hidden' }}>
+                                        <div style={{ width: `${cat.score}%`, height: '100%', background: cat.score >= 70 ? 'var(--success-color)' : 'var(--accent-color)', borderRadius: '3px' }}></div>
+                                    </div>
+                                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.4' }}>
+                                        {cat.feedback}
+                                    </p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
                 <div style={{ marginBottom: '2rem' }}>
                     <h3>Feedback Summary</h3>
                     <p style={{ lineHeight: '1.6', fontSize: '1.1rem' }}>{analysis.feedback}</p>
@@ -114,6 +137,8 @@ const Analysis = () => {
                                             <strong>💡 Better Approach:</strong> {q.improvement}
                                         </div>
                                     )}
+
+
                                 </div>
                             ))}
                         </div>
@@ -121,7 +146,7 @@ const Analysis = () => {
                 )}
 
             </div>
-        </div>
+        </div >
     );
 };
 

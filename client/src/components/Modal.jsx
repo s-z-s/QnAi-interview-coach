@@ -1,9 +1,10 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 
 const Modal = ({ isOpen, title, message, onConfirm, onCancel, confirmText = "Confirm", cancelText = "Cancel", type = "danger", children }) => {
     if (!isOpen) return null;
 
-    return (
+    return createPortal(
         <div style={{
             position: 'fixed',
             top: 0,
@@ -15,7 +16,7 @@ const Modal = ({ isOpen, title, message, onConfirm, onCancel, confirmText = "Con
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            zIndex: 1000
+            zIndex: 9999
         }}>
             <div className="glass-panel" style={{
                 padding: '2rem',
@@ -59,7 +60,8 @@ const Modal = ({ isOpen, title, message, onConfirm, onCancel, confirmText = "Con
                     to { transform: translateY(0); opacity: 1; }
                 }
             `}</style>
-        </div>
+        </div>,
+        document.body
     );
 };
 

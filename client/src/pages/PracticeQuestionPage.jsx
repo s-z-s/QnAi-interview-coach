@@ -25,6 +25,7 @@ const PracticeQuestionPage = () => {
             try {
                 const res = await api.get(`/jobs/${jobId}`);
                 const q = res.data.questions.find(item => item._id === questionId);
+                console.log("Practice Question Loaded:", q); // DEBUG: Check if categories exist
                 setQuestion(q);
                 setNotes(q.notes || '');
                 setOriginalNotes(q.notes || '');
@@ -36,7 +37,8 @@ const PracticeQuestionPage = () => {
                         analysis: {
                             score: q.score,
                             feedback: q.aiFeedback,
-                            improvedAnswer: q.improvedAnswer
+                            improvedAnswer: q.improvedAnswer,
+                            categories: q.categories || []
                         }
                     });
                 }
@@ -95,19 +97,26 @@ const PracticeQuestionPage = () => {
 
             {/* Top Row: Back & Question */}
             <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <button onClick={() => navigate(-1)} className="btn btn-secondary" style={{ alignSelf: 'flex-start', padding: '0.3rem 0.8rem', fontSize: '0.85rem' }}>
-                    ← Back
-                </button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <button onClick={() => navigate(-1)} className="btn btn-secondary" style={{ alignSelf: 'flex-start', padding: '0.3rem 0.8rem', fontSize: '0.85rem' }}>
+                        ← Back
+                    </button>
+                    {analysis && (
+                        <button onClick={() => setAnalysis(null)} className="btn btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>
+                            Try Again ↺
+                        </button>
+                    )}
+                </div>
                 <h2 style={{ fontSize: '1.25rem', lineHeight: '1.4', maxWidth: '1000px', margin: 0, fontWeight: '600', color: 'var(--text-primary)' }}>
                     {question.question}
                 </h2>
             </div>
 
             {/* Bottom Row: Split Pane */}
-            <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '1.5rem', minHeight: 0, overflow: 'hidden' }}>
+            <div style={{ flex: 1, display: 'flex', flexWrap: 'wrap', gap: '1.5rem', minHeight: 0, overflowY: 'auto', paddingBottom: '1rem' }}>
 
                 {/* Left: Notes Section */}
-                <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+                <div className="glass-panel" style={{ flex: '1 1 400px', padding: '2rem', display: 'flex', flexDirection: 'column', height: '100%', minHeight: '400px' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                         <h4 style={{ margin: 0, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '1px' }}>
                             Your Notes
@@ -143,7 +152,7 @@ const PracticeQuestionPage = () => {
                 </div>
 
                 {/* Right: Practice & Analysis */}
-                <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', height: '100%', overflow: 'hidden' }}>
+                <div className="glass-panel" style={{ flex: '1 1 400px', padding: '2rem', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', height: '100%', minHeight: '400px', overflow: 'hidden' }}>
 
                     {!analysis ? (
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', width: '100%' }}>
@@ -195,9 +204,8 @@ const PracticeQuestionPage = () => {
                         </div>
                     ) : (
                         <div style={{ width: '100%', height: '100%', overflowY: 'auto', paddingRight: '0.5rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--glass-border)' }}>
+                            <div style={{ marginBottom: '1.5rem', paddingBottom: '1rem', borderBottom: '1px solid var(--glass-border)' }}>
                                 <h2 className="text-gradient" style={{ margin: 0, fontSize: '1.5rem' }}>Analysis Result</h2>
-                                <button onClick={() => setAnalysis(null)} className="btn btn-secondary" style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}>Try Again ↺</button>
                             </div>
 
                             <div style={{ textAlign: 'center', marginBottom: '2rem', padding: '1.5rem', background: 'rgba(255,255,255,0.03)', borderRadius: '1rem' }}>
@@ -205,6 +213,22 @@ const PracticeQuestionPage = () => {
                                     {analysis.analysis.score}
                                 </div>
                                 <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Overall Score</div>
+
+                                {analysis.analysis.categories && analysis.analysis.categories.length > 0 && (
+                                    <div style={{ marginTop: '1.5rem', display: 'flex', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                        {analysis.analysis.categories.map((cat, idx) => (
+                                            <div key={idx} style={{
+                                                background: 'rgba(255,255,255,0.05)',
+                                                padding: '0.5rem 1rem',
+                                                borderRadius: '0.8rem',
+                                                minWidth: '100px'
+                                            }}>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.3rem' }}>{cat.category}</div>
+                                                <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: cat.score >= 70 ? 'var(--success-color)' : 'var(--accent-color)' }}>{cat.score}%</div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
                             <div style={{ marginBottom: '2rem' }}>

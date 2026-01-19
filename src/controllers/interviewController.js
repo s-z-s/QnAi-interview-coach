@@ -331,11 +331,22 @@ const endSession = async (req, res) => {
         **IMPORTANT**: Write the feedback in **SECOND PERSON** (address the candidate as **"You"**, do NOT use "The candidate/"he"/"she").
         Example: "You did a great job explaining..." instead of "The candidate did a great job..."
 
+        **CATEGORY EVALUATION**:
+        Identify 3-5 key categories relevant to this specific role (e.g., for Manager: Leadership, Communication, Strategy; for Student: Academic Potential, Learning Agility, Basics).
+        Rate the candidate on each of these categories.
+
         Provide the output in STRICT JSON format:
         {
             "score": number (0-100),
             "hiringProbability": "High" | "Medium" | "Low",
             "feedback": "Overall concise feedback in markdown (bullet points). Address the user directly as 'You'.",
+            "categories": [
+                {
+                    "category": "Name of the category (e.g., Communication Skills)",
+                    "score": number (0-100),
+                    "feedback": "One sentence feedback for this category."
+                }
+            ],
             "strengths": ["Strength 1", "Strength 2"],
             "improvements": ["Improvement 1", "Improvement 2"],
             "questions": [
@@ -393,12 +404,24 @@ const getHistory = async (req, res) => {
         const sessions = await Session.aggregate([
             { $match: matchStage },
             {
+                $lookup: {
+                    from: 'jobapplications',
+                    localField: 'jobApplicationId',
+                    foreignField: '_id',
+                    as: 'job'
+                }
+            },
+            { $unwind: { path: '$job', preserveNullAndEmptyArrays: true } },
+            {
                 $project: {
                     createdAt: 1,
                     score: 1,
                     hiringProbability: 1,
                     messageCount: { $size: "$messages" },
-                    analysis: 1
+                    analysis: 1,
+                    jobTitle: "$job.jobTitle",
+                    company: "$job.company",
+                    jobApplicationId: 1
                 }
             },
             { $sort: { createdAt: -1 } }

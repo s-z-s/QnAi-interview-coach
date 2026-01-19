@@ -105,6 +105,30 @@ const JobDetailsPage = () => {
         }
     };
 
+    const [modalConfig, setModalConfig] = useState({ isOpen: false, type: 'danger', title: '', message: '', onConfirm: null });
+
+    const confirmRemoveHistory = (sessionId) => {
+        setModalConfig({
+            isOpen: true,
+            title: "Remove Session",
+            message: "Are you sure you want to remove this practice session? This cannot be undone.",
+            confirmText: "Remove",
+            type: "danger",
+            onConfirm: () => handleRemoveHistory(sessionId),
+            onCancel: () => setModalConfig(prev => ({ ...prev, isOpen: false }))
+        });
+    };
+
+    const handleRemoveHistory = async (sessionId) => {
+        try {
+            await api.delete(`/interview/session/${sessionId}`);
+            setHistory(history.filter(h => h._id !== sessionId));
+            setModalConfig(prev => ({ ...prev, isOpen: false }));
+        } catch (error) {
+            console.error("Failed to delete session", error);
+        }
+    };
+
     if (loading) return <div className="container" style={{ textAlign: 'center', marginTop: '4rem' }}>Loading Job...</div>;
     if (!job) return <div className="container">Job not found</div>;
 
@@ -159,13 +183,35 @@ const JobDetailsPage = () => {
                                             Mock Interview · {sess.score || 0}% Score
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => navigate(`/analysis/${sess._id}`, { state: { from: `/job/${id}` } })}
-                                        className="btn btn-secondary"
-                                        style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
-                                    >
-                                        View Report
-                                    </button>
+                                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                        <button
+                                            onClick={() => navigate(`/analysis/${sess._id}`, { state: { from: `/job/${id}` } })}
+                                            className="btn btn-secondary"
+                                            style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
+                                        >
+                                            View Report
+                                        </button>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                confirmRemoveHistory(sess._id);
+                                            }}
+                                            className="btn"
+                                            style={{
+                                                fontSize: '0.8rem',
+                                                padding: '0.4rem 0.8rem',
+                                                color: 'var(--error-color)',
+                                                border: '1px solid var(--error-color)',
+                                                background: 'transparent',
+                                                borderRadius: '0.5rem',
+                                                cursor: 'pointer'
+                                            }}
+                                            onMouseOver={(e) => e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)'}
+                                            onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
                                 </div>
                             ))}
                         </div>
@@ -193,7 +239,7 @@ const JobDetailsPage = () => {
                                 transition: 'all 0.2s'
                             }}
                         >
-                            To Do ({todoQuestions.length})
+                            To Practice ({todoQuestions.length})
                         </button>
                         <button
                             onClick={() => setActiveTab('practiced')}
@@ -208,7 +254,7 @@ const JobDetailsPage = () => {
                                 transition: 'all 0.2s'
                             }}
                         >
-                            Completed ({practicedQuestions.length})
+                            Practiced ({practicedQuestions.length})
                         </button>
                         <button
                             onClick={() => setActiveTab('all')}
@@ -223,7 +269,7 @@ const JobDetailsPage = () => {
                                 transition: 'all 0.2s'
                             }}
                         >
-                            All ({questions.length})
+                            All Questions ({questions.length})
                         </button>
                     </div>
 
@@ -260,8 +306,8 @@ const JobDetailsPage = () => {
                                 borderLeft: q.practicedAt ? '4px solid var(--success-color)' : '4px solid var(--accent-color)',
                                 transition: 'transform 0.2s',
                             }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                                    <div style={{ flex: 1 }}>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1.5rem' }}>
+                                    <div style={{ flex: '1 1 300px' }}>
                                         <h3 style={{ margin: 0, fontSize: '1.1rem', marginBottom: '0.5rem', lineHeight: '1.5' }}>
                                             {q.question}
                                         </h3>
@@ -383,7 +429,17 @@ const JobDetailsPage = () => {
                     autoFocus
                 />
             </Modal>
-        </div>
+            {/* Confirmation Modal */}
+            <Modal
+                isOpen={modalConfig.isOpen}
+                title={modalConfig.title}
+                message={modalConfig.message}
+                onConfirm={modalConfig.onConfirm}
+                onCancel={modalConfig.onCancel}
+                confirmText={modalConfig.confirmText}
+                type={modalConfig.type}
+            />
+        </div >
     );
 };
 

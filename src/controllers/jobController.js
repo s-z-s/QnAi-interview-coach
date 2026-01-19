@@ -171,8 +171,23 @@ const analyzePracticeAnswer = async (req, res) => {
 
         **IMPORTANT**: Write the feedback in **SECOND PERSON** (address the candidate as **"You"**).
 
+        **CATEGORY EVALUATION**:
+        Identify 3 key categories for this specific question (e.g., Clarity, Relevance, Depth).
+        Rate the answer on each.
+
         Provide short, specific feedback and a score (0-100).
-        Output STRICT JSON: { "score": 85, "feedback": "Markdown supported feedback. Address user as 'You'...", "improvedAnswer": "Markdown supported improved answer..." }
+        Output STRICT JSON: 
+        { 
+            "score": 85, 
+            "feedback": "Markdown supported feedback...", 
+            "improvedAnswer": "Markdown supported improved answer...",
+            "categories": [
+                {
+                    "category": "Name",
+                    "score": number
+                }
+            ]
+        }
         `;
 
         const text = await robustGeminiRequest(prompt, { jsonMode: true });
@@ -189,6 +204,7 @@ const analyzePracticeAnswer = async (req, res) => {
                     q.score = analysis.score;
                     q.aiFeedback = analysis.feedback;
                     q.improvedAnswer = analysis.improvedAnswer;
+                    q.categories = analysis.categories || [];
                     q.practicedAt = new Date();
                     await job.save();
                 }

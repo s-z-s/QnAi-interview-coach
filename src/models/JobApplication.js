@@ -32,7 +32,11 @@ const jobApplicationSchema = mongoose.Schema({
         aiFeedback: String,
         score: Number,
         improvedAnswer: String,
-        practicedAt: Date
+        practicedAt: Date,
+        categories: [{
+            category: String,
+            score: Number
+        }]
     }]
 }, {
     timestamps: true
