@@ -51,7 +51,10 @@ const registerUser = async (req, res) => {
 
         res.status(201).json({
             _id: user.id,
+            name: user.name,
             email: user.email,
+            purpose: user.purpose,
+            cvText: user.cvText,
             token: token, // Return token for Bearer auth
         });
     } else {
@@ -81,7 +84,10 @@ const loginUser = async (req, res) => {
 
         res.json({
             _id: user.id,
+            name: user.name,
             email: user.email,
+            purpose: user.purpose,
+            cvText: user.cvText,
             token: token, // Return token for Bearer auth
         });
     } else {

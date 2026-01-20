@@ -59,7 +59,22 @@ const JobDetailsPage = () => {
             setActiveTab('todo'); // Switch to todo to show new questions
         } catch (error) {
             console.error(error);
-            alert("Failed to generate questions. Ensure CV and Job Description are long enough.");
+            if (error.response && error.response.status === 400) {
+                setModalConfig({
+                    isOpen: true,
+                    title: "Missing Profile Info",
+                    message: "You need to upload your CV/Resume to generate personalized questions.",
+                    confirmText: "Go to Profile",
+                    type: "info",
+                    onConfirm: () => {
+                        navigate('/profile');
+                        setModalConfig(prev => ({ ...prev, isOpen: false }));
+                    },
+                    onCancel: () => setModalConfig(prev => ({ ...prev, isOpen: false }))
+                });
+            } else {
+                alert("Failed to generate questions. Ensure Job Description is detailed enough.");
+            }
         } finally {
             setGenerating(false);
         }
@@ -102,6 +117,22 @@ const JobDetailsPage = () => {
             navigate(`/interview/${res.data._id}`);
         } catch (error) {
             console.error(error);
+            if (error.response && error.response.status === 400) {
+                setModalConfig({
+                    isOpen: true,
+                    title: "Missing Profile Info",
+                    message: "Please upload your CV/Resume in your Profile before starting a mock interview.",
+                    confirmText: "Go to Profile",
+                    type: "info",
+                    onConfirm: () => {
+                        navigate('/profile');
+                        setModalConfig(prev => ({ ...prev, isOpen: false }));
+                    },
+                    onCancel: () => setModalConfig(prev => ({ ...prev, isOpen: false }))
+                });
+            } else {
+                alert("Failed to start session. Please try again.");
+            }
         }
     };
 
@@ -221,6 +252,9 @@ const JobDetailsPage = () => {
 
             {/* Questions Section */}
             <div>
+                <h2 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: 'var(--text-primary)', borderLeft: '4px solid var(--accent-color)', paddingLeft: '1rem' }}>
+                    Interview Preparation
+                </h2>
                 {/* Controls & Tabs */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
 

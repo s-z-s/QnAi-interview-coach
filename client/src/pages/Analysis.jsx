@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const Analysis = () => {
     const { id } = useParams();
@@ -38,6 +39,16 @@ const Analysis = () => {
         }
     };
 
+    const { user } = useAuth();
+
+    const getProbabilityLabel = () => {
+        const purpose = user?.purpose || 'Job Interview';
+        if (purpose === 'College Interview') return 'Admission Chance';
+        if (purpose === 'Scholarship Interview') return 'Selection Chance';
+        if (purpose === 'General Practice') return 'Success Chance';
+        return 'Hiring Chance';
+    };
+
     return (
         <div className="container" style={{ padding: '2rem 1rem' }}>
             <button onClick={handleBack} className="btn btn-secondary" style={{ marginBottom: '2rem' }}>
@@ -63,7 +74,7 @@ const Analysis = () => {
                         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center'
                     }}>
                         <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{analysis.hiringProbability}</span>
-                        <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>Hiring Chance</span>
+                        <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>{getProbabilityLabel()}</span>
                     </div>
                 </div>
 

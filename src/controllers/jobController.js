@@ -76,6 +76,12 @@ const generateQuestions = async (req, res) => {
 
         const user = await User.findById(req.user.id);
 
+        if (!user.cvText || user.cvText.trim().length < 50) {
+            return res.status(400).json({
+                message: 'Profile Incomplete: Please upload your CV/Resume in your Profile to generate personalized questions.'
+            });
+        }
+
         const prompt = `
         Generate 10 highly probable interview questions for this specific role, taking into account the candidate's CV and Job Description.
         
@@ -156,7 +162,7 @@ const analyzePracticeAnswer = async (req, res) => {
         const scribe = await elevenLabsClient.speechToText.convert({
             file: audioBlob,
             model_id: "scribe_v2",
-            tag_audio_events: false, // Changed to false for cleaner text
+            tag_audio_events: true, // Changed to false for cleaner text
             language_code: "eng"
         });
         const userAnswer = scribe.text;

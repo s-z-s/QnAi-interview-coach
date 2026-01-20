@@ -152,13 +152,12 @@ const startSession = async (req, res) => {
             }
         }
 
-        // Fallback or validation
-        if (!jobDescription) {
-            // Try user profile if legacy
-            if (!req.user.jobDescription) {
-                // It's allowed to start without JD? Maybe generic interview.
-                // But typically we want one. Let's proceed but warn or generic.
-            }
+
+        // Check if user has uploaded a CV (or equivalent text)
+        if (!req.user.cvText || req.user.cvText.trim().length < 50) {
+            return res.status(400).json({
+                message: 'Profile Incomplete: Please upload your CV/Resume in your Profile before starting a mock interview.'
+            });
         }
 
         // 2. Generate Initial Greeting (Context-Aware)

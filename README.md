@@ -2,24 +2,46 @@
 
 QnAi is an advanced, AI-powered interview preparation platform designed to help users ace their Job, College, or Scholarship interviews.
 
-It uses **Gemini AI** for intelligent context-aware questioning and analysis, and **ElevenLabs** for realistic voice interaction, creating a seamless voice-first practice environment.
+It uses **Gemini AI** for intelligent context-aware questioning, analysis, and scoring, and **ElevenLabs Scribe V2** for realistic voice agents, creating a seamless voice-first practice environment.
 
 ## ✨ Features
 
-*   **Dynamic Interview Context**: Tailors questions based on your goal (Job, College, Scholarship, General Practice).
-*   **Voice-First Interaction**: Speak naturally to the AI; it listens, transcribes, and responds with voice.
-*   **Real-time Analysis**: Get instant feedback on your answers (clarity, confidence, content).
-*   **Resume Integration**: Upload your PDF CV, and the AI will ask personalized questions based on your experience.
-*   **Comprehensive Reports**: View detailed scoring, hiring probability, and improvement tips for every session.
-*   **Modern UI**: Fully responsive, glassmorphism-inspired design.
+### 🎯 Application Management & Practice
+*   **Application Dashboard**: Track specific job, college or scholarship applications.
+*   **Generate Probable Questions**: Automatically generate highly probable interview questions for any job description or add some of your own manually.
+*   **Strategy & Notes**: Add your own notes and talking points to each question to prepare your strategy.
+*   **Individual Practice Loop**: Practice questions one by one, recording your answers as many times as needed to improve.
+*   **Category-Based Scoring**: Get granular feedback on every attempt with scores for specific categories (e.g., Clarity, Relevance) to help you get better with each try.
+*   **Persistent History**: All your practice sessions and recording scores are saved for future review.
+
+### 🧠 Smart Mock Interviews
+*   **Dynamic Context**: Tailors questions based on your specific goal (e.g., "Product Manager at Google", "MBA Applicant at Harvard", "Scholarship Applicant at Chevening", etc.).
+*   **Voice-First Interaction**: Speak with the AI just like a real interviewer. It listens, processes, and responds with lifelike audio.
+*   **Resume Aware**: Upload your PDF CV, and the AI will ask personalized questions based on your background.
+
+### 📊 Detailed Analysis & Feedback
+*   **360° Evaluation**: Get a detailed scorecard after every session, including Hiring Probability, Strengths, and Improvements.
+*   **Category-Based Scoring**: Evaluation is broken down by 3-5 key categories relevant to your role (e.g., Leadership, Communication, Technical Skills).
+*   **Question-by-Question Breakdown**: Detailed feedback for every single answer, including "Better Approach" suggestions.
+
+### 🎨 Modern Experience
+*   **Glassmorphism UI**: A beautiful, modern interface with dark mode aesthetics.
+*   **Responsive Design**: Fully optimized for Desktop, Tablet, and Mobile.
+*   **Secure**: JWT-based authentication with HttpOnly cookies.
+
+---
 
 ## 🛠️ Tech Stack
 
-*   **Frontend**: React (Vite), CSS Modules/Glassmorphism
+*   **Frontend**: React (Vite), CSS Modules (Glassmorphism), Recorder.js
 *   **Backend**: Node.js, Express.js
 *   **Database**: MongoDB (Mongoose)
-*   **AI & ML**: Google Gemini 1.5 Pro (Reasoning), ElevenLabs (TTS/STT)
-*   **Authentication**: JWT (HttpOnly Cookies)
+*   **AI & ML**: 
+    *   **Google Gemini 2.5 Flash**: Complex reasoning, scoring, and feedback generation.
+    *   **ElevenLabs**: High-quality Text-to-Speech (TTS) and Speech-to-Text (STT/Scribe).
+*   **Authentication**: JWT, bcryptjs
+
+---
 
 ## 🚀 Getting Started
 
@@ -83,13 +105,24 @@ Follow these steps to set up the project locally.
     ```
     *The app will run on `http://localhost:5173`*
 
-## 📱 Usage
+---
 
-1.  Open the app in your browser.
-2.  **Register** a new account (select your Goal: Job, College, etc.).
-3.  **Upload your CV** in the Profile section.
-4.  Go to the **Dashboard** and start a **New Interview**.
-5.  Speak your answers and receive AI feedback!
+## 📱 Usage Guide
+
+1.  **Register**: Create an account and select your primary goal (Job, College, etc.).
+2.  **Profile**: Upload your CV (PDF) to give the AI context about your history.
+3.  **Practice Mode**:
+    *   Add an application (Job, College, Scholarship).
+    *   Click "Generate Questions" to have AI predict what you'll be asked.
+    *   Click "Practice" on any question to enter **Practice Mode**.
+    *   Record your answer, get instant category-based scoring, and save your notes.
+4.  **Mock Interview**:
+    *   Click "Start Mock Interview" on the Dashboard.
+    *   Choose a generic session or link it to a specific Job Application.
+    *   Speak your answers and interact with the AI.
+    *   End the session to generate your **Analysis Report**.
+
+---
 
 ## 📄 License
 
