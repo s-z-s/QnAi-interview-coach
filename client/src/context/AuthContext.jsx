@@ -14,17 +14,21 @@ export const AuthProvider = ({ children }) => {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
                 setUser(JSON.parse(storedUser));
-                // Verify/Refresh from API to ensure sync
+            }
+            // Stop loading immediately so app renders
+            setLoading(false);
+
+            // Background verification
+            if (storedUser) {
                 try {
                     const res = await api.get('/auth/profile');
                     setUser(res.data);
                     localStorage.setItem('user', JSON.stringify(res.data));
                 } catch (error) {
-                    console.error("Failed to refresh profile", error);
-                    // If 401, logout? For now just keep local data or do nothing
+                    console.error("Failed to refresh profile in background", error);
+                    // Optional: If 401, you might want to logout, but for network errors keep local data
                 }
             }
-            setLoading(false);
         };
         loadUser();
     }, []);
