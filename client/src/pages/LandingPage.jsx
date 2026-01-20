@@ -116,7 +116,10 @@ const LandingPage = () => {
 
             {/* Navbar */}
             <nav style={styles.nav}>
-                <div className="text-gradient" style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>QnAi</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <img src="/favicon.png" alt="QnAi Logo" style={{ height: '40px' }} />
+                    <span className="text-gradient" style={{ fontSize: '1.8rem', fontWeight: 'bold' }}>QnAi</span>
+                </div>
                 <div style={{ display: 'flex', gap: '1rem' }}>
                     {user ? (
                         <Link to="/dashboard" className="btn btn-primary">Go to Dashboard</Link>
@@ -315,7 +318,10 @@ const LandingPage = () => {
 
             {/* Footer */}
             <footer style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-secondary)', borderTop: '1px solid var(--glass-border)' }}>
-                <div style={{ marginBottom: '1rem', fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--text-primary)' }}>QnAi</div>
+                <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                    <img src="/favicon.png" alt="QnAi Logo" style={{ height: '30px', opacity: 0.8 }} />
+                    <span style={{ fontWeight: 'bold', fontSize: '1.2rem', color: 'var(--text-primary)' }}>QnAi</span>
+                </div>
                 <p>&copy; 2026 QnAi. All rights reserved.</p>
             </footer>
         </div>

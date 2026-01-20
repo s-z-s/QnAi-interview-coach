@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import Modal from '../components/Modal';
 
 const JobDashboard = () => {
     const [jobs, setJobs] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const [showAddModal, setShowAddModal] = useState(false);
+    const [deleteConfig, setDeleteConfig] = useState({ jobId: null });
     const [newJob, setNewJob] = useState({ company: '', jobTitle: '', description: '' });
 
     const { user } = useAuth();
@@ -85,6 +87,23 @@ const JobDashboard = () => {
         } catch (error) {
             console.error("Create Job Error:", error);
             alert("Failed to create application");
+        }
+    };
+
+    const confirmDelete = (jobId, e) => {
+        e.stopPropagation(); // Prevent card click
+        setDeleteConfig({ jobId });
+    };
+
+    const handleDeleteJob = async () => {
+        try {
+            await api.delete(`/jobs/${deleteConfig.jobId}`);
+            setDeleteConfig({ jobId: null });
+            // Optimistic update or refetch
+            setJobs(prev => prev.filter(job => job._id !== deleteConfig.jobId));
+        } catch (error) {
+            console.error("Delete Error:", error);
+            alert("Failed to delete application");
         }
     };
 
@@ -212,7 +231,33 @@ const JobDashboard = () => {
             ) : (
                 <div style={styles.grid}>
                     {jobs.map(job => (
-                        <div key={job._id} className="glass-panel" style={styles.card}>
+                        <div key={job._id} className="glass-panel" style={{ ...styles.card, position: 'relative' }}>
+                            <button
+                                onClick={(e) => confirmDelete(job._id, e)}
+                                style={{
+                                    position: 'absolute',
+                                    top: '10px',
+                                    right: '10px',
+                                    width: '30px',
+                                    height: '30px',
+                                    borderRadius: '50%',
+                                    background: 'rgba(239, 68, 68, 0.2)',
+                                    color: '#ef4444',
+                                    border: 'none',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s',
+                                    fontSize: '1rem'
+                                }}
+                                title="Delete Application"
+                                onMouseEnter={(e) => { e.currentTarget.style.background = '#ef4444'; e.currentTarget.style.color = 'white'; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)'; e.currentTarget.style.color = '#ef4444'; }}
+                            >
+                                ✕
+                            </button>
+
                             <div>
                                 <h3 style={styles.cardTitle}>{job.jobTitle}</h3>
                                 <div style={styles.cardSubtitle}>{job.company}</div>
@@ -233,6 +278,17 @@ const JobDashboard = () => {
                     ))}
                 </div>
             )}
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                isOpen={!!deleteConfig.jobId}
+                title="Delete Application"
+                message="Are you sure you want to delete this application? All practice history and generated questions will be permanently lost."
+                confirmText="Delete"
+                type="danger"
+                onConfirm={handleDeleteJob}
+                onCancel={() => setDeleteConfig({ jobId: null })}
+            />
 
             {/* Add Modal */}
             {showAddModal && (
